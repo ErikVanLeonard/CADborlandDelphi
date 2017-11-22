@@ -1,0 +1,138 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Dise'#241'o Asistido Por Computadora'
+  ClientHeight = 589
+  ClientWidth = 1049
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  Menu = MainMenu1
+  OldCreateOrder = False
+  OnActivate = FormActivate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Image1: TImage
+    Left = 8
+    Top = 48
+    Width = 873
+    Height = 513
+  end
+  object GroupBox1: TGroupBox
+    Left = 895
+    Top = 335
+    Width = 129
+    Height = 82
+    Caption = 'Escalaci'#243'n'
+    TabOrder = 5
+  end
+  object Grid1: TStringGrid
+    Left = 895
+    Top = 48
+    Width = 129
+    Height = 120
+    ColCount = 2
+    RowCount = 2
+    TabOrder = 0
+  end
+  object Grid2: TStringGrid
+    Left = 895
+    Top = 174
+    Width = 130
+    Height = 120
+    ColCount = 2
+    RowCount = 2
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 1
+  end
+  object CheckBox1: TCheckBox
+    Left = 912
+    Top = 312
+    Width = 97
+    Height = 17
+    Caption = 'Mover Objeto'
+    TabOrder = 2
+    OnClick = CheckBox1Click
+  end
+  object CheckBox2: TCheckBox
+    Left = 912
+    Top = 359
+    Width = 97
+    Height = 17
+    Caption = 'Escalar Objeto'
+    TabOrder = 3
+    OnClick = CheckBox2Click
+  end
+  object Edit1: TEdit
+    Left = 912
+    Top = 382
+    Width = 97
+    Height = 21
+    TabOrder = 4
+  end
+  object MainMenu1: TMainMenu
+    Left = 8
+    Top = 8
+    object Archivo1: TMenuItem
+      Caption = 'Archivo'
+      object GuardarImagen1: TMenuItem
+        Caption = 'Guardar Imagen'
+      end
+      object Salirdelprograma1: TMenuItem
+        Caption = 'Salir del programa'
+      end
+    end
+    object Manipulaci1: TMenuItem
+      Caption = 'Imagen'
+      object LimpiarEspaciodeTrabajo1: TMenuItem
+        Caption = 'Limpiar Espacio de Trabajo'
+      end
+    end
+    object Forma1: TMenuItem
+      Caption = 'Forma'
+      object Lineadedospuntos1: TMenuItem
+        Caption = 'Linea de dos puntos'
+        ShortCut = 16460
+        OnClick = Lineadedospuntos1Click
+      end
+      object Polilinea1: TMenuItem
+        Caption = 'Polilinea'
+        ShortCut = 16464
+        OnClick = Polilinea1Click
+      end
+      object Bezier1: TMenuItem
+        Caption = 'Bezier'
+        ShortCut = 16450
+        OnClick = Bezier1Click
+      end
+      object Arco1: TMenuItem
+        Caption = 'Arco'
+        ShortCut = 16449
+        OnClick = Arco1Click
+      end
+      object Circulo1: TMenuItem
+        Caption = 'Circulo'
+        ShortCut = 16451
+        OnClick = Circulo1Click
+      end
+      object riangulo1: TMenuItem
+        Caption = 'Triangulo'
+        ShortCut = 16468
+        OnClick = riangulo1Click
+      end
+      object Elipse1: TMenuItem
+        Caption = 'Elipse'
+        ShortCut = 16453
+        OnClick = Elipse1Click
+      end
+    end
+  end
+end

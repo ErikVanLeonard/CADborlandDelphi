@@ -1,0 +1,403 @@
+unit Unit1;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls,Grids, StdCtrls, math, Menus;
+
+type
+  TForm1 = class(TForm)
+    Image1: TImage;
+    MainMenu1: TMainMenu;
+    Archivo1: TMenuItem;
+    GuardarImagen1: TMenuItem;
+    Salirdelprograma1: TMenuItem;
+    Manipulaci1: TMenuItem;
+    LimpiarEspaciodeTrabajo1: TMenuItem;
+    Forma1: TMenuItem;
+    Lineadedospuntos1: TMenuItem;
+    Polilinea1: TMenuItem;
+    Bezier1: TMenuItem;
+    Arco1: TMenuItem;
+    Circulo1: TMenuItem;
+    riangulo1: TMenuItem;
+    Elipse1: TMenuItem;
+    Grid1: TStringGrid;
+    Grid2: TStringGrid;
+    CheckBox1: TCheckBox;
+    CheckBox2: TCheckBox;
+    Edit1: TEdit;
+    GroupBox1: TGroupBox;
+    CheckBox3: TCheckBox;
+    Color1: TMenuItem;
+    Colordecontorno1: TMenuItem;
+    Colorderelleno1: TMenuItem;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    procedure Image1MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure Colordecontorno1Click(Sender: TObject);
+    procedure CheckBox3Click(Sender: TObject);
+    procedure CheckBox2Click(Sender: TObject);
+    procedure CheckBox1Click(Sender: TObject);
+    procedure Bezier1Click(Sender: TObject);
+    procedure Arco1Click(Sender: TObject);
+    procedure Elipse1Click(Sender: TObject);
+    procedure Circulo1Click(Sender: TObject);
+    procedure riangulo1Click(Sender: TObject);
+    procedure Polilinea1Click(Sender: TObject);
+    procedure Lineadedospuntos1Click(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+  clics,nb,ter,opera,renglon:Integer;
+  escala: Real;
+  c1,c2,c3:Integer;
+  r,g,b:Integer;
+
+implementation
+
+{$R *.dfm}
+// paleta de colores
+function GetHTMLColor(cl:Tcolor;IsBackColor:Boolean):String;
+ var
+ rgbColor:TColorRef;
+
+ begin
+   if IsBackColor then
+   result:='bg'
+   else
+   result:='';
+   rgbcolor:=colortorgb(cl);
+   result:=result+ 'Color:="#'+
+   format('%.2x%.2x%.2x',
+   [GetRValue(rgbcolor),
+   GetGValue(rgbcolor),
+   GetBValue(rgbcolor)])+'"';
+   r:=getRValue(rgbcolor);
+   g:=getgvalue(rgbcolor);
+   b:=getbvalue(rgbcolor);
+
+    end;
+
+// fin paleta de colores
+
+
+ // dda
+procedure dda (x1,y1,x2,y2,c1,c2,c3:integer;image1:timage);
+var
+k:integer;
+dx,dy:integer;
+steps:integer;
+x_mas,y_mas:real;
+x,y:real;
+begin
+dx:=x2-x1;
+dy:=y2-y1;
+if abs(dx)>abs(dy) then
+begin
+steps:=abs(dx);
+end
+else
+begin
+steps:=abs(dy);
+end;
+x_mas:=dx/steps;
+y_mas:=dy/steps;
+x:=trunc(x1);
+y:=trunc(y1);
+for k:=1 to steps do
+begin
+x:=x+(x_mas);
+y:=y+(y_mas);
+image1.canvas.pixels[trunc(x),trunc(y)]:=rgb(c1,c2,c3);
+end;
+end;
+// termina dda
+
+// elipse
+   procedure elipse(xc,yc,r1,r2,angi,angf,c1,c2,c3:Integer;image1:Timage);
+var
+i:Integer;
+x,y,ang:Real;
+begin
+ ang:=angi;
+ for i := angi*10 to angf*10  do
+  begin
+   x:=xc+r1*cos(degtorad(ang));
+   y:=yc+r2*sin(degtorad(ang));
+   image1.Canvas.Pixels[trunc(x),trunc(y)]:=rgb(c1,c2,c3);
+   ang:=ang+0.1;
+  end;
+end;
+// elipse termina
+
+//circulo
+     procedure circulo(angi,angf,c1,c2,c3:Integer;Grid1:TStringGrid;image1:Timage);
+var
+i:Integer;
+begin
+ for i := 1 to grid1.RowCount - 1 do
+  begin
+   elipse(strtoint(grid1.Cells[0,i-1]),
+       strtoint(grid1.Cells[1,i-1]),
+       (strtoint(grid1.Cells[0,i])-strtoint(grid1.Cells[0,i-1])),
+       (strtoint(grid1.Cells[0,i])-strtoint(grid1.Cells[0,i-1])),
+       angi,angf,c1,c2,c3,image1);
+  end;
+end;
+//circulo termina
+
+// elipse2
+ procedure elipse2(angi,angf,c1,c2,c3:Integer;Grid1:TStringGrid;image1:Timage);
+var
+i:Integer;
+begin
+ for i := 1 to grid1.RowCount - 1 do
+  begin
+   elipse(strtoint(grid1.Cells[0,i-1]),
+       strtoint(grid1.Cells[1,i-1]),
+       (strtoint(grid1.Cells[0,i])-strtoint(grid1.Cells[0,i-1])),
+       (strtoint(grid1.Cells[0,i])-strtoint(grid1.Cells[0,i-1]))+60,
+       angi,angf,c1,c2,c3,image1);
+  end;
+end;
+//elipse2 termina
+
+// polilinea
+procedure polilineas(c1,c2,c3:Integer;Grid1:TStringGrid;image1:Timage);
+var
+i:Integer;
+begin
+ for i := 1 to grid1.RowCount - 1 do
+  begin
+   dda(strtoint(grid1.Cells[0,i-1]),
+       strtoint(grid1.Cells[1,i-1]),
+       strtoint(grid1.Cells[0,i]),
+       strtoint(grid1.Cells[1,i]),c1,c2,c3,image1);
+  end;
+  dda(strtoint(grid1.Cells[0,i-1]),
+       strtoint(grid1.Cells[1,i-1]),
+       strtoint(grid1.Cells[0,0]),
+       strtoint(grid1.Cells[1,0]),c1,c2,c3,image1);
+end;
+// polilinea termina
+
+//creacion bezier
+procedure bezier(c1,c2,c3:Integer;grid1:TStringGrid;image1:timage);
+var
+ba:array [0..3] of tpoint;
+begin
+ image1.Canvas.Pen.Width:=4;
+ image1.Canvas.Pen.Color:=rgb(c1,c2,c3);
+ ba[0].x:=strtoint(grid1.Cells[0,0]);
+ ba[0].y:=strtoint(grid1.Cells[1,0]);
+ ba[1].x:=strtoint(grid1.Cells[0,1]);
+ ba[1].y:=strtoint(grid1.Cells[1,1]);
+ ba[2].x:=strtoint(grid1.Cells[0,2]);
+ ba[2].y:=strtoint(grid1.Cells[1,2]);
+ ba[3].x:=strtoint(grid1.Cells[0,3]);
+ ba[3].y:=strtoint(grid1.Cells[1,3]);
+image1.Canvas.PolyBezier(ba);
+//bezier termina
+ end;
+procedure TForm1.Arco1Click(Sender: TObject);
+begin
+ Grid1.RowCount:=2;
+ Grid2.RowCount:=2;
+ nb:=7;
+end;
+
+procedure TForm1.Bezier1Click(Sender: TObject);
+begin
+Grid1.RowCount:=4;
+ Grid2.RowCount:=4;
+ nb:=9;
+end;
+
+procedure TForm1.CheckBox1Click(Sender: TObject);
+begin
+if checkbox1.Checked=true then
+begin
+opera:=1;
+end;
+if checkbox1.Checked=false then
+begin
+  opera:=0;
+end;
+end;
+
+procedure TForm1.CheckBox2Click(Sender: TObject);
+var
+i:Integer;
+begin
+if checkbox2.Checked=true then
+begin
+    //escala polilinea
+ if ((nb=1)or(nb=2)or(nb=3)or(nb=5)or(nb=6)or(nb=10)or(nb=11)) then
+  begin
+   polilineas(255,255,255,grid1,image1);
+   escala:=strtofloat(edit1.Text);
+   for i:= 0 to grid1.RowCount - 1 do
+    begin
+     grid1.Cells[0,i]:=inttostr(trunc(strtoint(grid1.Cells[0,i])*escala));
+     grid1.Cells[1,i]:=inttostr(trunc(strtoint(grid1.Cells[1,i])*escala));
+    end;
+   polilineas(c1,c2,c3,grid1,image1);
+  end;
+ //escala circulo
+ if nb=4 then
+  begin
+   circulo(0,360,255,255,255,grid1,image1);
+   escala:=strtofloat(edit1.Text);
+   for i := 0 to grid1.RowCount - 1 do
+    begin
+     grid1.Cells[0,i]:=inttostr(trunc(strtoint(grid1.Cells[0,i])*escala));
+     grid1.Cells[1,i]:=inttostr(trunc(strtoint(grid1.Cells[1,i])*escala));
+    end;
+   circulo(0,360,c1,c2,c3,grid1,image1);
+  end;
+ //escala arco
+ if nb=7 then
+  begin
+   circulo(180,360,255,255,255,grid1,image1);
+   escala:=strtofloat(edit1.Text);
+   for i := 0 to grid1.RowCount - 1 do
+    begin
+     grid1.Cells[0,i]:=inttostr(trunc(strtoint(grid1.Cells[0,i])*escala));
+     grid1.Cells[1,i]:=inttostr(trunc(strtoint(grid1.Cells[1,i])*escala));
+    end;
+   circulo(180,360,c1,c2,c3,grid1,image1);
+  end;
+ //escala elipse
+ if nb=8 then
+  begin
+   elipse2(0,360,255,255,255,grid1,image1);
+   escala:=strtofloat(edit1.Text);
+   for i := 0 to grid1.RowCount - 1 do
+    begin
+     grid1.Cells[0,i]:=inttostr(trunc(strtoint(grid1.Cells[0,i])*escala));
+     grid1.Cells[1,i]:=inttostr(trunc(strtoint(grid1.Cells[1,i])*escala));
+    end;
+   elipse2(0,360,c1,c2,c3,grid1,image1);
+  end;
+ //escala curva bezier
+ if nb=9 then
+  begin
+   bezier(255,255,255,grid1,image1);
+   escala:=strtofloat(edit1.Text);
+   for i := 0 to grid1.RowCount - 1 do
+    begin
+     grid1.Cells[0,i]:=inttostr(trunc(strtoint(grid1.Cells[0,i])*escala));
+     grid1.Cells[1,i]:=inttostr(trunc(strtoint(grid1.Cells[1,i])*escala));
+    end;
+   bezier(c1,c2,c3,grid1,image1);
+  end;
+end;
+end;
+
+procedure TForm1.CheckBox3Click(Sender: TObject);
+begin
+if checkbox3.Checked=true then
+begin
+opera:=4;
+end;
+if checkbox3.Checked=false then
+opera:=0;
+end;
+
+procedure TForm1.Circulo1Click(Sender: TObject);
+begin
+Grid1.RowCount:=2;
+ Grid2.RowCount:=2;
+ nb:=4
+end;
+
+procedure TForm1.Colordecontorno1Click(Sender: TObject);
+begin
+  with TColorDialog.Create(self) do
+  try
+    if Execute then
+    begin
+      gethtmlcolor(color,true);
+
+
+    end;
+  finally
+    Free;
+  end;
+end;
+
+procedure TForm1.Elipse1Click(Sender: TObject);
+begin
+Grid1.RowCount:=2;
+ Grid2.RowCount:=2;
+ nb:=8;
+end;
+
+procedure TForm1.FormActivate(Sender: TObject);
+begin
+clics:=0;
+nb:=0;
+ter:=0;
+opera:=0;
+r:=0;
+g:=0;
+b:=0;
+end;
+
+procedure TForm1.Image1MouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+a:array [0..3] of tpoint;
+i: Integer;
+begin
+grid1.Cells[0,clics]:=inttostr(X);
+ grid1.Cells[1,clics]:=inttostr(y);
+ clics:=clics+1;
+ image1.Canvas.Pen.Color:=rgb(0,0,0);
+ image1.Canvas.Pen.Width:=1;
+ image1.Canvas.Ellipse(x-2,y-2,x+2,y+2);
+ if clics=4 then
+ begin
+   clics:=0;
+   for I := 0 to 3 do
+   begin
+     a[i].X:=strtoint(grid1.Cells[0,i]);
+      a[i].Y:=strtoint(grid1.Cells[1,i]);
+   end;
+   image1.Canvas.PolyBezier(a);
+ end;
+end;
+
+procedure TForm1.Lineadedospuntos1Click(Sender: TObject);
+begin
+ Grid1.RowCount:=2;
+ Grid2.RowCount:=2;
+ nb:=6;
+end;
+
+procedure TForm1.Polilinea1Click(Sender: TObject);
+begin
+ter:=strtoint(inputbox('Clicks','Numero de puntos:','2'));
+ Grid1.RowCount:=ter;
+ Grid2.RowCount:=ter;
+ nb:=11;
+end;
+
+procedure TForm1.riangulo1Click(Sender: TObject);
+begin
+Grid1.RowCount:=3;
+Grid2.RowCount:=3;
+nb:=1;
+end;
+
+end.
